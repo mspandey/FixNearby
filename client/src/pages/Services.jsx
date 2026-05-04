@@ -6,14 +6,12 @@ import { getDistanceKm, formatDistance } from '../utils/distance';
 
 const Services = () => {
   const [searchParams] = useSearchParams();
+
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
   const [categoryFilter, setCategoryFilter] = useState('All');
   const [workers, setWorkers] = useState([]);
   const [error, setError] = useState(null);
-  const [sortByDistance, setSortByDistance] = useState(false);
-
-  const { coords, loading: geoLoading, error: geoError } = useLocation();
 
   const categories = [
     "All",
@@ -40,6 +38,44 @@ const Services = () => {
     Gardener: "🌱",
     "Appliance Repair": "🔌",
     "Pest Control": "🐜",
+  };
+
+  // 🌍 LOCATION HANDLER
+  useEffect(() => {
+    requestLocation();
+  }, []);
+
+  const requestLocation = () => {
+    if (!navigator.geolocation) {
+      setLocationStatus("unsupported");
+      return;
+    }
+
+    setLocationStatus("loading");
+
+    const timer = setTimeout(() => {
+      setLocationStatus("timeout");
+    }, 8000);
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        clearTimeout(timer);
+        setLocation({
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+        });
+        setLocationStatus("success");
+      },
+      (err) => {
+        clearTimeout(timer);
+
+        if (err.code === 1) {
+          setLocationStatus("denied");
+        } else {
+          setLocationStatus("error");
+        }
+      }
+    );
   };
 
   // Mock worker data – each worker has a mock lat/lng offset from user
@@ -86,32 +122,30 @@ const Services = () => {
   // Filter + optional sort by distance
   const filteredWorkers = useMemo(() => {
     const query = searchQuery.toLowerCase();
-    let result = workersWithDistance.filter((worker) => {
-      const matchesSearch =
-        worker.name.toLowerCase().includes(query) ||
-        worker.profession.toLowerCase().includes(query);
-      const matchesCategory =
-        categoryFilter === "All" || worker.profession === categoryFilter;
-      return matchesSearch && matchesCategory;
-    });
+    const matchesSearch =
+      worker.name.toLowerCase().includes(query) ||
+      worker.profession.toLowerCase().includes(query);
 
-    if (sortByDistance && coords) {
-      result = [...result].sort((a, b) => (a.distanceKm ?? Infinity) - (b.distanceKm ?? Infinity));
-    }
+    const matchesCategory =
+      categoryFilter === "All" || worker.profession === categoryFilter;
 
-    return result;
-  }, [workersWithDistance, searchQuery, categoryFilter, sortByDistance, coords]);
+    return matchesSearch && matchesCategory;
+  });
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div className="max-w-7xl mx-auto px-4 py-12">
+
       {/* Header */}
-      <div className="mb-10 text-center">
-        <h1 className="text-4xl font-extrabold text-gray-900 mb-4">
-          Find Reliable Services Near You
-        </h1>
-        <p className="text-lg text-gray-500">
+      <div className="mb-6 text-center">
+        <h1 className="text-4xl font-bold">Find Reliable Services Near You</h1>
+        <p className="text-gray-500 mt-2">
           Discover top-rated professionals in your neighborhood
         </p>
+
+        {/* 🌍 LOCATION UI */}
+        <div className="mt-4 text-sm">
+          {renderLocationBanner()}
+        </div>
       </div>
 
       {/* Search and Filters */}
@@ -119,16 +153,16 @@ const Services = () => {
         <div className="flex flex-col sm:flex-row gap-4 max-w-3xl mx-auto">
           <div className="relative flex-1">
             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
-            <input
-              type="text"
+            <input 
+              type="text" 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by name or service (e.g. Electrician)..."
+              placeholder="Search by name or service (e.g. Electrician)..." 
               className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition"
             />
           </div>
           {searchQuery && (
-            <button
+            <button 
               onClick={() => setSearchQuery('')}
               className="px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-medium transition"
             >
@@ -153,29 +187,11 @@ const Services = () => {
             </button>
           ))}
         </div>
-
-        {/* Sort-by-distance toggle — only visible when location is available */}
-        {coords && (
-          <div className="flex justify-center">
-            <button
-              onClick={() => setSortByDistance(prev => !prev)}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold border transition-all duration-200 ${
-                sortByDistance
-                  ? 'bg-green-600 text-white border-green-600 shadow-lg'
-                  : 'bg-white text-gray-600 border-gray-200 hover:border-green-400 hover:text-green-600 shadow-sm'
-              }`}
-            >
-              <span>📍</span>
-              {sortByDistance ? 'Sorted: Nearest First' : 'Sort by Distance'}
-            </button>
-          </div>
-        )}
       </div>
 
+      {/* Loading */}
       {loading ? (
-        <div className="py-20">
-          <LoadingSpinner />
-        </div>
+        <LoadingSpinner />
       ) : error ? (
         <div className="text-center py-20 text-red-600 font-medium">
           {error}
@@ -185,7 +201,7 @@ const Services = () => {
           <div className="text-6xl mb-4">🔦</div>
           <h3 className="text-2xl font-bold text-gray-900 mb-2">No workers found</h3>
           <p className="text-gray-500 mb-8 max-w-md mx-auto">We couldn't find any professionals matching your search. Try broadening your filters.</p>
-          <button
+          <button 
             onClick={() => {
               setSearchQuery('');
               setCategoryFilter('All');
@@ -198,8 +214,7 @@ const Services = () => {
       ) : (
         <>
           <p className="text-sm text-gray-500 mb-6 font-medium">
-            Showing {filteredWorkers.length} professionals
-            {coords && sortByDistance && ' · sorted by distance'}
+            Showing {filteredWorkers.length} professionals found
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredWorkers.map((worker) => (
@@ -218,8 +233,8 @@ const Services = () => {
                   </div>
                   <h3 className="text-2xl font-bold text-gray-900 mb-1 group-hover:text-blue-600 transition-colors">{worker.name}</h3>
                   <p className="text-blue-600 font-bold mb-4">{worker.profession}</p>
-
-                  <div className="flex items-center gap-4 text-sm text-gray-600 mb-4 bg-gray-50 p-3 rounded-lg">
+                  
+                  <div className="flex items-center gap-4 text-sm text-gray-600 mb-6 bg-gray-50 p-3 rounded-lg">
                     <div className="flex items-center gap-1">
                       <span className="text-yellow-400">★</span>
                       <span className="font-bold text-gray-900">{worker.rating}</span>
@@ -227,30 +242,13 @@ const Services = () => {
                     <div className="w-px h-4 bg-gray-300"></div>
                     <div className="font-bold text-gray-900">{worker.price}</div>
                   </div>
-
-                  {/* Distance badge */}
-                  {worker.distanceKm !== null ? (
-                    <div className="flex items-center gap-1.5 text-xs font-semibold text-green-700 bg-green-50 px-3 py-1.5 rounded-full w-fit">
-                      <span>📍</span>
-                      <span>{formatDistance(worker.distanceKm)} away</span>
-                    </div>
-                  ) : geoLoading ? (
-                    <div className="flex items-center gap-1.5 text-xs text-gray-400 bg-gray-50 px-3 py-1.5 rounded-full w-fit">
-                      <span className="inline-block w-2.5 h-2.5 rounded-full border border-gray-300 border-t-transparent animate-spin" />
-                      Detecting distance…
-                    </div>
-                  ) : geoError ? (
-                    <div className="text-xs text-amber-600 bg-amber-50 px-3 py-1.5 rounded-full w-fit font-medium">
-                      📍 Location unavailable
-                    </div>
-                  ) : null}
                 </div>
                 <div className="p-8 pt-0">
-                  <Link
-                    to={`/worker/${worker.id}`}
+                  <Link 
+                    to={`/worker/${worker.id}`} 
                     className="block w-full text-center bg-gray-900 hover:bg-blue-600 text-white font-bold py-4 rounded-xl transition-all duration-300 shadow-md hover:shadow-blue-200"
                   >
-                    View Details &amp; Book
+                    View Details & Book
                   </Link>
                 </div>
               </div>
