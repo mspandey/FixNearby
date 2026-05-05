@@ -19,6 +19,7 @@ const Navbar = () => {
             <Link to="/dashboard" className="text-gray-700 hover:text-blue-600 font-medium transition duration-200 hover:underline underline-offset-4">Dashboard</Link>
             <Link to="/bookings" className="text-gray-700 hover:text-blue-600 font-medium transition duration-200 hover:underline underline-offset-4">Bookings</Link>
             <Link to="/profile" className="text-gray-700 hover:text-blue-600 font-medium transition duration-200 hover:underline underline-offset-4">Profile</Link>
+            <Link to="/help" className="text-gray-700 hover:text-blue-600 font-medium transition duration-200 hover:underline underline-offset-4">Help</Link>
           </div>
         </div>
       </div>
