@@ -1,4 +1,5 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import { useMemo } from 'react';
 import { useLocation } from '../context/LocationContext';
 import { getDistanceKm, formatDistance } from '../utils/distance';
@@ -56,6 +57,41 @@ const Home = () => {
               FixNearby connects you with trusted electricians, plumbers, carpenters, and more. Fast, secure, and hassle-free.
             </p>
 
+            {/* 🔍 Search Bar (Quick Access) */}
+<div className="mt-6 max-w-2xl mx-auto">
+
+  <div className="flex items-center bg-white shadow-md rounded-xl overflow-hidden border border-gray-200 focus-within:ring-2 focus-within:ring-blue-500 transition">
+
+    <input
+      type="text"
+      placeholder="Search services like Electrician, Plumber..."
+      className="flex-1 px-5 py-3 outline-none text-gray-700"
+    />
+
+    <Link
+      to="/services"
+      className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 font-medium transition"
+    >
+      Search
+    </Link>
+
+  </div>
+
+  {/* ⚡ Quick Access Buttons */}
+  <div className="mt-4 flex flex-wrap justify-center gap-3">
+    {["Electrician", "Plumber", "Cleaner", "AC Technician"].map((item) => (
+      <Link
+        key={item}
+        to={`/services?category=${item}`}
+        className="px-4 py-2 bg-gray-100 hover:bg-blue-100 text-sm rounded-full transition"
+      >
+        {item}
+      </Link>
+    ))}
+  </div>
+
+</div>
+
             <div className="mt-8 flex flex-col sm:flex-row justify-center gap-4">
               
               <Link
@@ -90,6 +126,20 @@ const Home = () => {
           <p className="text-gray-500 mb-16">
             Get your job done in 3 simple steps
           </p>
+
+          <div className="max-w-6xl mx-auto mt-10 grid md:grid-cols-3 gap-8">
+    {[
+      { step: "1", title: "Search", desc: "Find skilled workers near you" },
+      { step: "2", title: "Book", desc: "Choose time and confirm instantly" },
+      { step: "3", title: "Relax", desc: "Get your job done stress-free" },
+    ].map((s) => (
+      <div key={s.step} className="p-6 border rounded-xl hover:shadow-lg transition">
+        <div className="text-blue-600 font-bold text-xl">{s.step}</div>
+        <h3 className="font-semibold mt-2">{s.title}</h3>
+        <p className="text-gray-500 mt-1">{s.desc}</p>
+      </div>
+    ))}
+    </div>
       {/* ── Near You Section ── */}
       {(geoLoading || coords || geoError) && (
         <div className="py-20 bg-gradient-to-br from-blue-50 via-white to-green-50">
