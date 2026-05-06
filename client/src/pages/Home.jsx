@@ -415,13 +415,19 @@ const Home = () => {
         <p className="mb-6 text-blue-100">
           Book trusted professionals instantly and get your job done without hassle.
         </p>
-
+        
         <Link
           to="/services"
           className="bg-white text-blue-600 px-8 py-3 rounded-lg font-medium hover:bg-gray-100 transition"
         >
           Get Started
         </Link>
+        <Link
+  to="/feedback"
+  className="bg-white text-blue-600 px-8 py-3 rounded-lg font-medium hover:bg-gray-100 transition"
+>
+  Give Feedback
+</Link>
       </div>
 
     </div>
