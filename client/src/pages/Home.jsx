@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'; // Home page component
+import { Link } from 'react-router-dom';
 import { useMemo } from 'react';
 import { useLocation } from '../context/LocationContext';
 import { getDistanceKm, formatDistance } from '../utils/distance';
@@ -115,7 +115,7 @@ const IconBox = ({ className = '' }) => (
   </Icon>
 );
 
-// Mock workers (same data as Services.jsx – in production this would come from an API)
+// Mock workers
 const ALL_WORKERS = [
   { id: 1, name: "John Doe", profession: "Electrician", rating: 4.8, price: "$40/hr", mockOffset: { lat: 0.012, lon: 0.008 } },
   { id: 2, name: "Jane Smith", profession: "Plumber", rating: 4.9, price: "$50/hr", mockOffset: { lat: -0.005, lon: 0.020 } },
@@ -128,23 +128,6 @@ const ALL_WORKERS = [
   { id: 9, name: "Imran Khan", profession: "Appliance Repair", rating: 4.6, price: "$35/hr", mockOffset: { lat: -0.018, lon: -0.030 } },
   { id: 10, name: "Neha Gupta", profession: "Pest Control", rating: 4.5, price: "$40/hr", mockOffset: { lat: 0.025, lon: -0.005 } },
 ];
-
-const iconMap = {
-  Electrician: "⚡",
-  Plumber: "🚰",
-  Carpenter: "🪵",
-  Painting: "🎨",
-  Cleaning: "🧹",
-  "AC Repair": "❄️",
-  "Pest Control": "🐜",
-  Moving: "📦",
-  Cleaner: "🧹",
-  "AC Technician": "❄️",
-  Mechanic: "🔧",
-  Gardener: "🌱",
-  "Appliance Repair": "🔌",
-  Painter: "🎨",
-};
 
 const workerIconMap = {
   Electrician: IconBolt,
@@ -164,7 +147,6 @@ const categoryIconMap = workerIconMap;
 const Home = () => {
   const { coords, loading: geoLoading, error: geoError } = useLocation();
 
-  // Compute distances and pick the 3 closest workers
   const nearbyWorkers = useMemo(() => {
     if (!coords) return [];
     return ALL_WORKERS
@@ -185,9 +167,7 @@ const Home = () => {
       {/* Hero */}
       <section className="relative overflow-hidden bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-          {/* Wrapper reserves space for the card (so it won't get clipped) */}
           <div className="relative pb-24 sm:pb-28">
-            {/* Image panel stays rounded + clipped */}
             <div className="relative rounded-[36px] shadow-[0_18px_40px_rgba(15,23,42,0.18)] overflow-hidden">
               <div className="relative h-[320px] sm:h-[380px] lg:h-[420px]">
                 <img
@@ -200,7 +180,6 @@ const Home = () => {
               </div>
             </div>
 
-            {/* Card sits lower and can overflow below the image (no clipping) */}
             <div className="absolute left-1/2 top-[220px] sm:top-[260px] lg:top-[290px] -translate-x-1/2 w-full px-5 sm:px-8">
               <div className="mx-auto w-full max-w-[560px] rounded-2xl bg-white/95 backdrop-blur border border-slate-200 shadow-[0_14px_32px_rgba(15,23,42,0.18)] px-7 py-7 sm:px-10 sm:py-9">
                 <div className="text-center">
@@ -241,7 +220,6 @@ const Home = () => {
           </div>
 
           <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-14 text-center relative">
-            {/* connector line */}
             <div className="hidden md:block absolute top-[46px] left-0 w-full h-px bg-slate-200" />
 
             {[
@@ -250,7 +228,6 @@ const Home = () => {
               { step: '3', title: 'Relax & Enjoy', desc: 'Let the expert handle the job with peace of mind.', IconComp: IconCheckCircle },
             ].map((s) => (
               <div key={s.step} className="relative">
-                {/* arrow to next */}
                 {s.step !== '3' ? (
                   <div className="hidden md:block absolute top-[36px] right-[-22px] text-slate-300 text-xl">
                     →
