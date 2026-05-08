@@ -43,11 +43,11 @@ const Register = () => {
         }
         break;
         
-       case "phone":
-          if (value && !/^[0-9]{10}$/.test(value.trim()) {
-              return "Enter a valid phone number";
-  }
-         break;
+      case "phone":
+        if (value && !/^[0-9]{10}$/.test(value.trim())) {
+          return "Enter a valid phone number";
+        }
+        break;
 
       default:
         return "";

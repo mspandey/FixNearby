@@ -1,181 +1,51 @@
-import EmptyState from '../components/EmptyState';
+const stats = [
+  { label: "Total Bookings", value: "12" },
+  { label: "Active Jobs", value: "2" },
+  { label: "Completed", value: "10" },
+  { label: "Rating", value: "4.8/5" },
+];
 
 const Dashboard = () => {
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">User Dashboard</h1>
-      <div className="bg-white shadow overflow-hidden sm:rounded-lg p-6">
-        <h3 className="text-lg leading-6 font-medium text-gray-900">Welcome back!</h3>
-        <p className="mt-1 max-w-2xl text-sm text-gray-500">This is a placeholder dashboard. Contributors will add user-specific data here.</p>
-        
-        <div className="mt-6 border-t border-gray-200 pt-4">
-          <EmptyState
-            icon="🗓️"
-            title="No active bookings yet"
-            description="You haven't booked any services recently. Browse trusted professionals and book a service today."
-            primaryAction={{ label: 'Browse Services', to: '/services' }}
-          />
-          {/* TODO: Connect API here to fetch user data/bookings */}
-          <div className="text-center py-10 bg-gray-50 rounded border border-dashed border-gray-300">
-            <span className="text-slate-600 leading-relaxed">No active bookings yet.</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default Dashboard;
-const Dashboard = () => {
-  const stats = [
-    { label: "Total Bookings", value: "12", color: "blue" },
-    { label: "Active Jobs", value: "2", color: "emerald" },
-    { label: "Completed", value: "10", color: "purple" },
-    { label: "Rating", value: "4.8★", color: "yellow" },
-  ];
-
-  return (
-    <div className="bg-slate-50 min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-
-        {/* Header */}
-        <div className="mb-10">
-          <h1 className="text-4xl font-extrabold text-slate-900">
-            User Dashboard
-          </h1>
-          <p className="mt-2 text-slate-700">
-            Manage your bookings, track progress, and view activity.
-          </p>
-        </div>
-
-        {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10">
-          {stats.map((item, idx) => (
-            <div
-              key={idx}
-              className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-lg transition"
-            >
-              <div className="text-sm text-slate-500 font-medium">
-                {item.label}
-              </div>
-              <div className="text-3xl font-extrabold text-slate-900 mt-2">
-                {item.value}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Main Card */}
-        <div className="bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl transition p-8">
-
-          <h3 className="text-xl font-bold text-slate-900">
-            Welcome back!
-          </h3>
-
-          <p className="mt-2 text-slate-600">
-            This is your personal activity panel. You can track bookings and service history here.
-          </p>
-
-          {/* Empty state */}
-          <div className="mt-8 flex flex-col items-center justify-center py-16 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
-
-            <div className="text-4xl mb-3">📦</div>
-
-            <p className="text-slate-600 font-medium">
-              No active bookings yet
-            </p>
-
-            <p className="text-slate-500 text-sm mt-1">
-              Book a service to see updates here
-            </p>
-
-            <button className="mt-5 bg-[#0056D2] hover:bg-[#0047AF] text-white px-6 py-2.5 rounded-xl font-semibold transition">
-              Browse Services
-            </button>
-
-          </div>
-
-        </div>
-
-      </div>
-    </div>
-  );
-};
-
-export default Dashboard;
-import React from 'react';
-
-const Dashboard = () => {
-  const stats = [
-    { label: "Total Bookings", value: "12", color: "blue" },
-    { label: "Active Jobs", value: "2", color: "emerald" },
-    { label: "Completed", value: "10", color: "purple" },
-    { label: "Rating", value: "4.8★", color: "yellow" },
-  ];
-
-  return (
-    <div className="bg-slate-50 min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-
-        {/* Header */}
+    <div className="min-h-screen bg-slate-50">
+      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="mb-10">
           <h1 className="text-4xl font-extrabold text-slate-900">
             User Dashboard
           </h1>
           <p className="mt-2 text-slate-600">
-            Manage your bookings, track progress, and view activity.
+            Manage your bookings, track progress, and review recent activity.
           </p>
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10">
-          {stats.map((item, idx) => (
+        <div className="mb-10 grid grid-cols-2 gap-6 md:grid-cols-4">
+          {stats.map((item) => (
             <div
-              key={idx}
-              className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-lg transition"
+              key={item.label}
+              className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
             >
-              <div className="text-sm text-slate-500 font-medium">
-                {item.label}
-              </div>
-              <div className="text-3xl font-extrabold text-slate-900 mt-2">
+              <p className="text-sm font-medium text-slate-500">{item.label}</p>
+              <p className="mt-2 text-3xl font-extrabold text-slate-900">
                 {item.value}
-              </div>
+              </p>
             </div>
           ))}
         </div>
 
-        {/* Main Card */}
-        <div className="bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl transition p-8">
-
-          <h3 className="text-xl font-bold text-slate-900">
-            Welcome back!
-          </h3>
-
+        <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+          <h2 className="text-xl font-bold text-slate-900">Welcome back</h2>
           <p className="mt-2 text-slate-600">
-            This is your personal activity panel. You can track bookings and service history here.
+            This is your personal activity panel. Upcoming bookings and service
+            history will appear here.
           </p>
 
-          {/* Empty state */}
-          <div className="mt-8 flex flex-col items-center justify-center py-16 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
-
-            <div className="text-4xl mb-3">📦</div>
-
-            <p className="text-slate-600 font-medium">
-              No active bookings yet
+          <div className="mt-8 rounded-2xl border border-dashed border-slate-300 bg-slate-50 py-16 text-center">
+            <p className="font-medium text-slate-700">No active bookings yet.</p>
+            <p className="mt-1 text-sm text-slate-500">
+              Book a service to start tracking updates from your dashboard.
             </p>
-
-            <p className="text-slate-500 text-sm mt-1">
-              Book a service to see updates here
-            </p>
-
-            <button className="mt-5 bg-[#0056D2] hover:bg-[#0047AF] text-white px-6 py-2.5 rounded-xl font-semibold transition">
-              Browse Services
-            </button>
-
           </div>
-
         </div>
-
       </div>
     </div>
   );
