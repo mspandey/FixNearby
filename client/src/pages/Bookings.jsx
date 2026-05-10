@@ -1,154 +1,212 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import LoadingSpinner from "../components/LoadingSpinner";
+import StarRating from "../components/StarRating";
+
+const demoBookings = [
+  {
+    id: "BK-101",
+    worker: "Jane Smith",
+    service: "Plumbing",
+    date: "2026-05-10",
+    status: "Pending",
+  },
+  {
+    id: "BK-102",
+    worker: "John Doe",
+    service: "Electrical",
+    date: "2026-05-14",
+    status: "Pending",
+  },
+  {
+    id: "BK-103",
+    worker: "Mike Johnson",
+    service: "Carpentry",
+    date: "2026-05-01",
+    status: "Completed",
+  },
+];
+
+const statusOptions = ["All", "Pending", "Completed", "Cancelled"];
+
+const statusStyle = (status) => {
+  switch (status) {
+    case "Completed":
+      return "bg-emerald-100 text-emerald-800";
+    case "Pending":
+      return "bg-amber-100 text-amber-800";
+    case "Cancelled":
+      return "bg-rose-100 text-rose-800";
+    default:
+      return "bg-slate-100 text-slate-700";
+  }
+};
 
 const Bookings = () => {
   const [bookings, setBookings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  // Review State
   const [activeReview, setActiveReview] = useState(null);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
 
-  const statusOptions = ["All", "Pending", "Completed", "Cancelled"];
-
   useEffect(() => {
-    setTimeout(() => {
-      try {
-        const data = [
-          { id: 'BK-101', worker: 'Jane Smith', service: 'Plumbing', date: '2023-10-25', status: 'Completed' },
-          { id: 'BK-102', worker: 'John Doe', service: 'Electrical', date: '2023-11-05', status: 'Pending' },
-          { id: 'BK-103', worker: 'Mike Johnson', service: 'Carpentry', date: '2023-11-10', status: 'Cancelled' },
-        ];
-        setBookings(data);
-        setLoading(false);
-      } catch {
-        setError("Failed to fetch bookings");
-        setLoading(false);
+    try {
+      const savedBookings = localStorage.getItem("bookings");
+
+      if (savedBookings) {
+        setBookings(JSON.parse(savedBookings));
+      } else {
+        setBookings(demoBookings);
+        localStorage.setItem("bookings", JSON.stringify(demoBookings));
       }
-    }, 1000);
+    } catch (loadError) {
+      setError("Failed to load bookings.");
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
+  useEffect(() => {
+    if (!loading) {
+      localStorage.setItem("bookings", JSON.stringify(bookings));
+    }
+  }, [bookings, loading]);
+
+  const filteredBookings = useMemo(() => {
+    const query = search.trim().toLowerCase();
+
+    return bookings.filter((booking) => {
+      const matchesSearch =
+        !query ||
+        booking.worker.toLowerCase().includes(query) ||
+        booking.service.toLowerCase().includes(query);
+      const matchesStatus =
+        statusFilter === "All" || booking.status === statusFilter;
+
+      return matchesSearch && matchesStatus;
+    });
+  }, [bookings, search, statusFilter]);
+
   const handleCancel = (id) => {
-    const updated = bookings.map((b) =>
-      b.id === id ? { ...b, status: "Cancelled" } : b
+    setBookings((current) =>
+      current.map((booking) =>
+        booking.id === id ? { ...booking, status: "Cancelled" } : booking
+      )
     );
-    setBookings(updated);
   };
 
   const handleReviewSubmit = (id) => {
-    if (rating === 0) return alert("Please select a rating");
+    if (!rating) {
+      window.alert("Please select a rating before submitting.");
+      return;
+    }
 
-    const updated = bookings.map((b) =>
-      b.id === id ? { ...b, review: { rating, comment } } : b
+    setBookings((current) =>
+      current.map((booking) =>
+        booking.id === id
+          ? { ...booking, review: { rating, comment } }
+          : booking
+      )
     );
 
-    setBookings(updated);
     setActiveReview(null);
     setRating(0);
     setComment("");
   };
 
-  const filteredBookings = bookings.filter((b) => {
-    const matchesSearch =
-      b.worker.toLowerCase().includes(search.toLowerCase()) ||
-      b.service.toLowerCase().includes(search.toLowerCase());
-
-    const matchesStatus =
-      statusFilter === "All" || b.status === statusFilter;
-
-    return matchesSearch && matchesStatus;
-  });
-
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-
-      <h1 className="text-4xl font-bold text-gray-900 mb-6">My Bookings</h1>
-
-      {/* Search */}
-      <input
-        type="text"
-        placeholder="Search by worker or service..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        className="mb-4 w-full md:w-1/2 px-4 py-2 border rounded-lg"
-      />
-
-      {/* Status Filters */}
-      <div className="flex gap-2 mb-6 flex-wrap">
-        {statusOptions.map((status) => (
-          <button
-            key={status}
-            onClick={() => setStatusFilter(status)}
-            className={`px-4 py-1 rounded-full text-sm border ${
-              statusFilter === status
-                ? "bg-blue-600 text-white"
-                : "bg-gray-100"
-            }`}
-          >
-            {status}
-          </button>
-        ))}
+    <div className="mx-auto max-w-6xl px-4 py-12">
+      <div className="mb-8">
+        <h1 className="text-4xl font-extrabold text-slate-900">My Bookings</h1>
+        <p className="mt-2 text-slate-600">
+          Track, manage, and review your service bookings.
+        </p>
       </div>
 
-      {/* States */}
-      {loading && <p className="text-gray-500">Loading bookings...</p>}
-      {error && <p className="text-red-500">{error}</p>}
+      <div className="mb-8 flex flex-col gap-4 md:flex-row">
+        <input
+          type="text"
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          placeholder="Search worker or service..."
+          className="w-full rounded-xl border border-slate-300 px-4 py-2.5 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 md:w-1/2"
+        />
 
-      {/* Empty State */}
-      {!loading && filteredBookings.length === 0 && (
-        <div className="text-center py-12 bg-white rounded-lg shadow">
-          <h3 className="text-lg font-medium">No bookings found</h3>
-          <p className="text-gray-500 mt-2">
-            Try a different filter or book a service.
+        <div className="flex flex-wrap gap-2">
+          {statusOptions.map((status) => (
+            <button
+              key={status}
+              type="button"
+              onClick={() => setStatusFilter(status)}
+              className={`rounded-full border px-4 py-1.5 text-sm font-medium transition ${
+                statusFilter === status
+                  ? "border-blue-600 bg-blue-600 text-white"
+                  : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+              }`}
+            >
+              {status}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {loading && <LoadingSpinner />}
+
+      {!loading && error && <p className="text-rose-600">{error}</p>}
+
+      {!loading && !error && filteredBookings.length === 0 && (
+        <div className="rounded-2xl border border-slate-200 bg-slate-50 py-16 text-center">
+          <h3 className="text-xl font-bold text-slate-900">No bookings found</h3>
+          <p className="mt-2 text-slate-600">
+            Try adjusting your filters or book a new service.
           </p>
           <Link
             to="/services"
-            className="mt-4 inline-block bg-blue-600 text-white px-4 py-2 rounded"
+            className="mt-5 inline-block rounded-xl bg-blue-600 px-5 py-2.5 font-medium text-white hover:bg-blue-700"
           >
-            Find Services
+            Browse Services
           </Link>
         </div>
       )}
 
-      {/* Booking List */}
-      {!loading && filteredBookings.length > 0 && (
-        <div className="bg-white shadow rounded-lg divide-y">
+      {!loading && !error && filteredBookings.length > 0 && (
+        <div className="space-y-4">
           {filteredBookings.map((booking) => (
-            <div key={booking.id} className="p-4 hover:bg-gray-50">
-              
-              {/* Top Row */}
-              <div className="flex justify-between items-center">
-                <p className="font-medium text-blue-600">
-                  {booking.service} with {booking.worker}
-                </p>
+            <div
+              key={booking.id}
+              className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:shadow-md"
+            >
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold text-slate-800">
+                    {booking.service}
+                  </h3>
+                  <p className="text-slate-600">{booking.worker}</p>
+                </div>
 
-                <span className={`text-xs px-2 py-1 rounded-full ${
-                  booking.status === "Completed"
-                    ? "bg-green-100 text-green-700"
-                    : booking.status === "Pending"
-                    ? "bg-yellow-100 text-yellow-700"
-                    : "bg-red-100 text-red-700"
-                }`}>
+                <span
+                  className={`rounded-full px-3 py-1 text-xs font-semibold ${statusStyle(
+                    booking.status
+                  )}`}
+                >
                   {booking.status}
                 </span>
               </div>
 
-              {/* Info Row */}
-              <div className="text-sm text-gray-500 mt-2 flex justify-between">
+              <div className="mt-3 flex flex-wrap justify-between gap-2 text-sm text-slate-500">
                 <span>ID: {booking.id}</span>
                 <span>{booking.date}</span>
               </div>
 
-              {/* Actions */}
-              <div className="mt-3 flex gap-4">
+              <div className="mt-4 flex flex-wrap gap-4 text-sm">
                 {booking.status === "Pending" && (
                   <button
+                    type="button"
                     onClick={() => handleCancel(booking.id)}
-                    className="text-red-600 hover:underline text-sm"
+                    className="font-medium text-rose-600 hover:text-rose-700"
                   >
                     Cancel
                   </button>
@@ -156,60 +214,56 @@ const Bookings = () => {
 
                 {booking.status === "Completed" && !booking.review && (
                   <button
+                    type="button"
                     onClick={() => setActiveReview(booking.id)}
-                    className="text-blue-600 hover:underline text-sm"
+                    className="font-medium text-blue-600 hover:text-blue-700"
                   >
                     Leave Review
                   </button>
                 )}
 
                 {booking.review && (
-                  <p className="text-green-600 text-sm">
-                    ⭐ {booking.review.rating} - Review Submitted
-                  </p>
+                  <span className="font-medium text-emerald-600">
+                    Rated {booking.review.rating}/5
+                  </span>
                 )}
               </div>
 
-              {/* Review Form */}
               {activeReview === booking.id && (
-                <div className="mt-4 p-4 bg-gray-50 rounded-lg border">
-                  <h4 className="text-sm font-semibold mb-2">Write a Review</h4>
+                <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
+                  <p className="mb-2 font-semibold text-slate-800">
+                    Rate your experience
+                  </p>
 
-                  {/* Rating */}
-                  <div className="flex gap-2 mb-3">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <button
-                        key={star}
-                        onClick={() => setRating(star)}
-                        className={`text-xl ${
-                          rating >= star ? "text-yellow-400" : "text-gray-300"
-                        }`}
-                      >
-                        ★
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* Comment */}
-                  <textarea
-                    value={comment}
-                    onChange={(e) => setComment(e.target.value)}
-                    placeholder="Write your feedback..."
-                    className="w-full border rounded-lg p-2 text-sm mb-3"
+                  <StarRating
+                    rating={rating}
+                    onRatingChange={setRating}
+                    size="md"
                   />
 
-                  {/* Buttons */}
-                  <div className="flex gap-3">
+                  <textarea
+                    value={comment}
+                    onChange={(event) => setComment(event.target.value)}
+                    placeholder="Write feedback..."
+                    className="mt-3 w-full rounded-lg border border-slate-300 p-2 text-sm"
+                  />
+
+                  <div className="mt-3 flex gap-3">
                     <button
+                      type="button"
                       onClick={() => handleReviewSubmit(booking.id)}
-                      className="bg-blue-600 text-white px-3 py-1 rounded text-sm"
+                      className="rounded-lg bg-blue-600 px-4 py-1.5 text-sm text-white"
                     >
                       Submit
                     </button>
-
                     <button
-                      onClick={() => setActiveReview(null)}
-                      className="text-gray-500 text-sm"
+                      type="button"
+                      onClick={() => {
+                        setActiveReview(null);
+                        setRating(0);
+                        setComment("");
+                      }}
+                      className="text-sm text-slate-500"
                     >
                       Cancel
                     </button>
@@ -220,7 +274,6 @@ const Bookings = () => {
           ))}
         </div>
       )}
-
     </div>
   );
 };
