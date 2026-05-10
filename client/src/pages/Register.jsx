@@ -1,13 +1,15 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { signupUser } from "../services/authService";
+import useToast from "../hooks/useToast";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import axios from "axios";
+
 
 const Register = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
-
+  const {showToast}=useToast();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -18,7 +20,6 @@ const Register = () => {
   const [interacted, setInteracted] = useState({});
   const [errors, setErrors]=useState({});
   const [apiError,setApiError]=useState(null);
-  const [message, setMessage]=useState(null);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -77,6 +78,7 @@ const Register = () => {
         [name]: errorMsg,
       }));
     }
+    if(apiError) setApiError(null);
   };
 
   // ---------------- HANDLE BLUR ----------------
@@ -101,7 +103,6 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage(null);
     setErrors({});
     setApiError(null);
 
@@ -131,25 +132,20 @@ const Register = () => {
     setLoading(true);
   
     try {
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/auth/register`,
-        {
+      const userData = await signupUser({
             name: formData.name,
             email: formData.email,
             phone: formData.phone,
-            password: formData.password,
-          });
-    
-      const userData = res.data;
+            password: formData.password,});
+
 
       login(userData);
-      setMessage("Registration successful! Welcome to FixNearby.");
-      
+      showToast("Registration successful! Welcome to FixNearby.");
 
       setFormData({name:"", email:"",phone: "", password:""});
       navigate("/dashboard");
     } catch(error) {
-      setApiError(error?.response?.data?.message || "Registration failed. Please try again.");
+      setApiError(error.message || "Registration failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -177,7 +173,7 @@ const Register = () => {
             Create an account
           </h2>
 
-          <p className="mt-2 text-sm text-gray-500">
+          <p className="mt-2 text-base sm:text-sm text-gray-600">
             Join FixNearby and get started
           </p>
         </div>
@@ -188,14 +184,9 @@ const Register = () => {
             {apiError}
           </div>
         )}
-         {message && (
-          <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-md text-sm">
-            {message}
-          </div>
-        )}
 
         {/* Form */}
-         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+         <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
           <div>
           {/* Name */}
             <input
@@ -243,17 +234,29 @@ const Register = () => {
             </div>
           </div>
 
+         {/* Phone */}
           <div>
-          {/* Phone */}
             <input
               id="phone"
               name="phone"
               type="tel"
               value={formData.phone}
               onChange={handleChange}
+              onBlur={handleBlur}
               placeholder="Phone Number"
               className={inputStyles("phone")}
             />
+              {/* Error Reserved space */}        
+              <div className="min-h-[22px] mt-1 text-sm">
+              {interacted.phone && errors.phone && (
+                <span className="text-red-600">
+                  {errors.phone}
+                </span>
+              )}
+            </div>
+          </div>  
+          {/* Password */}
+            <div>
             <div className="relative">
               <input
                 id="password"
@@ -262,8 +265,9 @@ const Register = () => {
                 required
                 value={formData.password}
                 onChange={handleChange}
+                onBlur={handleBlur}
                 placeholder="Password"
-                className="appearance-none relative block w-full px-3 py-2 border border-gray-300 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className={`${inputStyles("password")} pr-12`}
               />
               <button
                 type="button"
@@ -272,32 +276,10 @@ const Register = () => {
               >
                 {showPassword ? <FaEyeSlash /> : <FaEye />}
               </button>
+              </div>
 
-            {/* Empty reserved space */}
+            {/* error reserved space */}
           <div className="min-h-[22px] mt-1 text-sm">
-              {interacted.phone && errors.phone && (
-                <span className="text-red-600">
-                  {errors.phone}
-                </span>
-              )}
-            </div>
-          </div>
-
-          {/* Password */}
-          <div>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              required
-              value={formData.password}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              placeholder="Password"
-              className={inputStyles("password")}
-            />
-
-            <div className="min-h-[22px] mt-1 text-sm">
               {interacted.password && errors.password && (
                 <span className="text-red-600">
                   {errors.password}
@@ -306,6 +288,7 @@ const Register = () => {
             </div>
           </div>
 
+         
           {/* Submit Button */}
           <button
             type="submit"
@@ -323,12 +306,10 @@ const Register = () => {
           Already have an account?{" "}
           <Link
             to="/login"
-            className="text-blue-600 hover:underline font-medium"
+            className="text-blue-600 hover:underline font-semibold"
           >
             Sign in
           </Link>
-
-          
         </p>
       </div>
     </div>
