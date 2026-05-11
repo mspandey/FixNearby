@@ -559,7 +559,7 @@ const Services = () => {
 
               {/* STATS */}
 
-              <div className="grid grid-cols-2 gap-4 mt-6">
+              <div className="grid grid-cols-2 gap-4 mt-auto pt-6">
 
                 <div className="bg-slate-50 rounded-2xl p-4">
                   <p className="text-xs text-slate-500 mb-1">
@@ -773,7 +773,7 @@ const Services = () => {
                 key={w.id}
                 className="group relative bg-white border border-slate-200 rounded-[30px] p-6 hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 overflow-hidden"
               >
-
+                 <div className="flex-1 flex flex-col">
                 {/* RECOMMENDED */}
 
                 {w.recommended && (
@@ -818,7 +818,7 @@ const Services = () => {
 
                     </div>
 
-                    <p className="text-blue-600 font-semibold mt-1 text-lg">
+                    <p className="text-blue-600 font-semibold mt-1 text-lg min-h-[28px]">
 
                       {w.profession}
 
@@ -880,7 +880,7 @@ const Services = () => {
 
                 {/* STATS */}
 
-                <div className="grid grid-cols-3 gap-3 mt-6">
+                <div className="grid grid-cols-3 gap-3 mt-6 auto-rows-fr">
 
                   <div className="bg-slate-50 rounded-2xl p-4 text-center">
 
@@ -988,7 +988,7 @@ const Services = () => {
 
                 {/* OUTCOME BOX */}
 
-                <div className="mt-6 bg-blue-50 border border-blue-100 rounded-2xl p-4">
+                <div className="mt-6 bg-blue-50 border border-blue-100 rounded-2xl p-4 min-h-[88px] flex items-center">
 
                   <p className="text-sm leading-relaxed text-slate-700">
 
