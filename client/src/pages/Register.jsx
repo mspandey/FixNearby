@@ -145,7 +145,11 @@ const Register = () => {
       setFormData({name:"", email:"",phone: "", password:""});
       navigate("/dashboard");
     } catch(error) {
-      setApiError(error.message || "Registration failed. Please try again.");
+      if(!error.status) {
+        setApiError("Network error. Please check your connection and try again.");
+      } else {
+        setApiError(error.message || "Registration failed. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
