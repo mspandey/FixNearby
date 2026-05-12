@@ -9,7 +9,7 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 const Register = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
-  const {showToast}=useToast();
+  const { showToast } = useToast();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -18,16 +18,15 @@ const Register = () => {
   });
 
   const [interacted, setInteracted] = useState({});
-  const [errors, setErrors]=useState({});
-  const [apiError,setApiError]=useState(null);
+  const [errors, setErrors] = useState({});
+  const [apiError, setApiError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   // ---------------- VALIDATION ----------------
 
   const validateFields = (name, value) => {
-    const emailRegex =
-      /^[a-zA-Z0-9._%+-]+@[a-zA-Z]+\.[a-zA-Z]{2,}$/;
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z]+\.[a-zA-Z]{2,}$/;
 
     switch (name) {
       case "name":
@@ -45,7 +44,7 @@ const Register = () => {
           return "Password must be at least 6 characters";
         }
         break;
-        
+
       case "phone":
         if (value && !/^[0-9]{10}$/.test(value.trim())) {
           return "Enter a valid phone number";
@@ -69,7 +68,7 @@ const Register = () => {
       [name]: value,
     }));
 
-    // Validate while typing after interaction
+    // validate while typing after first interaction
     if (interacted[name]) {
       const errorMsg = validateFields(name, value);
 
@@ -78,7 +77,7 @@ const Register = () => {
         [name]: errorMsg,
       }));
     }
-    if(apiError) setApiError(null);
+    if (apiError) setApiError(null);
   };
 
   // ---------------- HANDLE BLUR ----------------
@@ -121,7 +120,7 @@ const Register = () => {
 
     setInteracted(allInteracted);
 
-    // Stop if validation errors exist
+    // stop if there are validation errors
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
@@ -130,21 +129,21 @@ const Register = () => {
     setErrors({});
     setApiError(null);
     setLoading(true);
-  
+
     try {
       const userData = await signupUser({
-            name: formData.name,
-            email: formData.email,
-            phone: formData.phone,
-            password: formData.password,});
-
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        password: formData.password,
+      });
 
       login(userData);
       showToast("Registration successful! Welcome to FixNearby.");
 
-      setFormData({name:"", email:"",phone: "", password:""});
+      setFormData({ name: "", email: "", phone: "", password: "" });
       navigate("/dashboard");
-    } catch(error) {
+    } catch (error) {
       setApiError(error.message || "Registration failed. Please try again.");
     } finally {
       setLoading(false);
@@ -167,17 +166,16 @@ const Register = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 py-10">
       <div className="w-full max-w-md bg-white rounded-3xl shadow-lg p-8">
+
         {/* Heading */}
         <div className="mb-8 text-center">
           <h2 className="text-3xl font-bold text-gray-900">
             Create an account
           </h2>
-
           <p className="mt-2 text-base sm:text-sm text-gray-600">
             Join FixNearby and get started
           </p>
         </div>
-  
 
         {apiError && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
@@ -186,9 +184,9 @@ const Register = () => {
         )}
 
         {/* Form */}
-         <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
-          <div>
+        <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
           {/* Name */}
+          <div>
             <input
               id="name"
               name="name"
@@ -200,41 +198,35 @@ const Register = () => {
               placeholder="Full Name"
               className={inputStyles("name")}
             />
+            <div className="min-h-[22px] mt-1 text-sm">
+              {interacted.name && errors.name && (
+                <span className="text-red-600">{errors.name}</span>
+              )}
+            </div>
+          </div>
 
-    <div className="min-h-[22px] mt-1 text-sm">
-      {interacted.name && errors.name && (
-        <span className="text-red-600">
-          {errors.name}
-        </span>
-      )}
-    </div>
-  </div>
-
-  {/* Email */}
-  <div>
-    <input
-      id="email-address"
-      name="email"
-      type="email"
-      required
-      value={formData.email}
-      onChange={handleChange}
-      onBlur={handleBlur}
-      placeholder="Email Address"
-      className={inputStyles("email")}
-    />
-
-    <div className="min-h-[22px] mt-1 text-sm">
-      {interacted.email && errors.email && (
-        <span className="text-red-600">
-          {errors.email}
-        </span>
-      )}
-    </div>
-  </div>
-
+          {/* Email */}
           <div>
-            {/* Phone */}
+            <input
+              id="email-address"
+              name="email"
+              type="email"
+              required
+              value={formData.email}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              placeholder="Email Address"
+              className={inputStyles("email")}
+            />
+            <div className="min-h-[22px] mt-1 text-sm">
+              {interacted.email && errors.email && (
+                <span className="text-red-600">{errors.email}</span>
+              )}
+            </div>
+          </div>
+
+          {/* Phone */}
+          <div>
             <input
               id="phone"
               name="phone"
@@ -245,42 +237,38 @@ const Register = () => {
               placeholder="Phone Number"
               className={inputStyles("phone")}
             />
-
             <div className="min-h-[22px] mt-1 text-sm">
               {interacted.phone && errors.phone && (
-                <span className="text-red-600">
-                  {errors.phone}
-                </span>
+                <span className="text-red-600">{errors.phone}</span>
               )}
             </div>
           </div>
 
           {/* Password */}
-          <div className="relative">
-            <input
-              id="password"
-              name="password"
-              type={showPassword ? "text" : "password"}
-              required
-              value={formData.password}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              placeholder="Password"
-              className={`${inputStyles("password")} pr-10`}
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-600 hover:text-gray-800"
-            >
-              {showPassword ? <FaEyeSlash /> : <FaEye />}
-            </button>
-
+          <div>
+            <div className="relative">
+              <input
+                id="password"
+                name="password"
+                type={showPassword ? "text" : "password"}
+                required
+                value={formData.password}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                placeholder="Password"
+                className={`${inputStyles("password")} pr-12`}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-500 hover:text-gray-700"
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </button>
+            </div>
             <div className="min-h-[22px] mt-1 text-sm">
               {interacted.password && errors.password && (
-                <span className="text-red-600">
-                  {errors.password}
-                </span>
+                <span className="text-red-600">{errors.password}</span>
               )}
             </div>
           </div>
@@ -291,9 +279,7 @@ const Register = () => {
             disabled={loading}
             className="w-full mt-4 py-3 rounded-xl bg-blue-600 text-white font-medium hover:bg-blue-700 transition disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            {loading
-              ? "Creating your account..."
-              : "Create account"}
+            {loading ? "Creating your account..." : "Create account"}
           </button>
         </form>
 
@@ -311,4 +297,5 @@ const Register = () => {
     </div>
   );
 };
+
 export default Register;

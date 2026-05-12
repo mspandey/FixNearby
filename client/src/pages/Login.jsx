@@ -141,31 +141,36 @@ const Login = () => {
             </div>
           </div>
 
-          <div className="relative">
-            <input
-              name="password"
-              type={showPassword ? 'text' : 'password'}
-              required
-              value={formData.password}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              placeholder="Password"
-              className={`${inputStyles("password")} pr-12`}
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700"
-            >
-              {showPassword ? <FaEyeSlash /> : <FaEye />}
-            </button>
+          {/* Password */}
+          <div>
+            <div className="relative">
+              <input
+                name="password"
+                type={showPassword ? 'text' : 'password'}
+                required
+                value={formData.password}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                placeholder="Password"
+                className={`${inputStyles("password")} pr-12`}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-500 hover:text-gray-700"
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </button>
+            </div>
+            {/* Reserved error space */}
             <div className="min-h-[22px] mt-1 text-sm">
               {interacted.password && errors.password && (
-                <span className="text-red-600">{errors.password}</span>
+                <span className="text-red-600">
+                  {errors.password}
+                </span>
               )}
             </div>
           </div>
-
           <button
             type="submit"
             disabled={loading}
