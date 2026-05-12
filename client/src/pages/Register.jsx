@@ -186,135 +186,135 @@ const Register = () => {
         )}
 
         {/* Form */}
-         <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
-          <div>
-          {/* Name */}
-            <input
-              id="name"
-              name="name"
-              type="text"
-              required
-              value={formData.name}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              placeholder="Full Name"
-              className={inputStyles("name")}
-            />
+<form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+  
+  {/* Name */}
+  <div>
+    <input
+      id="name"
+      name="name"
+      type="text"
+      required
+      value={formData.name}
+      onChange={handleChange}
+      onBlur={handleBlur}
+      placeholder="Full Name"
+      className={inputStyles("name")}
+    />
 
-            {/* Reserved error space */}
-            <div className="min-h-[22px] mt-1 text-sm">
-              {interacted.name && errors.name && (
-                <span className="text-red-600">
-                  {errors.name}
-                </span>
-              )}
-            </div>
-          </div>
-         
-          <div>
-          {/* Email */}
-            <input
-              id="email-address"
-              name="email"
-              type="email"
-              required
-              value={formData.email}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              placeholder="Email Address"
-              className={inputStyles("email")}
-            />
+    <div className="min-h-[22px] mt-1 text-sm">
+      {interacted.name && errors.name && (
+        <span className="text-red-600">
+          {errors.name}
+        </span>
+      )}
+    </div>
+  </div>
 
-            <div className="min-h-[22px] mt-1 text-sm">
-              {interacted.email && errors.email && (
-                <span className="text-red-600">
-                  {errors.email}
-                </span>
-              )}
-            </div>
-          </div>
+  {/* Email */}
+  <div>
+    <input
+      id="email-address"
+      name="email"
+      type="email"
+      required
+      value={formData.email}
+      onChange={handleChange}
+      onBlur={handleBlur}
+      placeholder="Email Address"
+      className={inputStyles("email")}
+    />
 
-         {/* Phone */}
-          <div>
-            <input
-              id="phone"
-              name="phone"
-              type="tel"
-              value={formData.phone}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              placeholder="Phone Number"
-              className={inputStyles("phone")}
-            />
-              {/* Error Reserved space */}        
-              <div className="min-h-[22px] mt-1 text-sm">
-              {interacted.phone && errors.phone && (
-                <span className="text-red-600">
-                  {errors.phone}
-                </span>
-              )}
-            </div>
-          </div>  
-          {/* Password */}
-            <div>
-            <div className="relative">
-              <input
-                id="password"
-                name="password"
-                type={showPassword ? "text" : "password"}
-                required
-                value={formData.password}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                placeholder="Password"
-                className={`${inputStyles("password")} pr-12`}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center"
-              >
-                {showPassword ? <FaEyeSlash /> : <FaEye />}
-              </button>
-              </div>
+    <div className="min-h-[22px] mt-1 text-sm">
+      {interacted.email && errors.email && (
+        <span className="text-red-600">
+          {errors.email}
+        </span>
+      )}
+    </div>
+  </div>
 
-            {/* error reserved space */}
-          <div className="min-h-[22px] mt-1 text-sm">
-              {interacted.password && errors.password && (
-                <span className="text-red-600">
-                  {errors.password}
-                </span>
-              )}
-            </div>
-          </div>
+  {/* Phone */}
+  <div>
+    <input
+      id="phone"
+      name="phone"
+      type="tel"
+      value={formData.phone}
+      onChange={handleChange}
+      onBlur={handleBlur}
+      placeholder="Phone Number"
+      className={inputStyles("phone")}
+    />
 
-         
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full mt-4 py-3 rounded-xl bg-blue-600 text-white font-medium hover:bg-blue-700 transition disabled:opacity-60 disabled:cursor-not-allowed"
-          >
-            {loading
-              ? "Creating your account..."
-              : "Create account"}
-          </button>
-          </div>
-        </form>
+    <div className="min-h-[22px] mt-1 text-sm">
+      {interacted.phone && errors.phone && (
+        <span className="text-red-600">
+          {errors.phone}
+        </span>
+      )}
+    </div>
+  </div>
 
-        {/* Footer */}
-        <p className="mt-6 text-center text-sm text-gray-600">
-          Already have an account?{" "}
-          <Link
-            to="/login"
-            className="text-blue-600 hover:underline font-semibold"
-          >
-            Sign in
-          </Link>
-        </p>
+  {/* Password */}
+  <div>
+    <div className="relative">
+      <input
+        id="password"
+        name="password"
+        type={showPassword ? "text" : "password"}
+        required
+        value={formData.password}
+        onChange={handleChange}
+        onBlur={handleBlur}
+        placeholder="Password"
+        className={inputStyles("password")}
+      />
+
+      <button
+        type="button"
+        onClick={() => setShowPassword(!showPassword)}
+        className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-500 hover:text-gray-700"
+      >
+        {showPassword ? <FaEyeSlash /> : <FaEye />}
+      </button>
+    </div>
+
+    <div className="min-h-[22px] mt-1 text-sm">
+      {interacted.password && errors.password && (
+        <span className="text-red-600">
+          {errors.password}
+        </span>
+      )}
+    </div>
+  </div>
+
+  {/* Submit Button */}
+  <button
+    type="submit"
+    disabled={loading}
+    className="w-full mt-4 py-3 rounded-xl bg-blue-600 text-white font-medium hover:bg-blue-700 transition disabled:opacity-60 disabled:cursor-not-allowed"
+  >
+    {loading
+      ? "Creating your account..."
+      : "Create account"}
+  </button>
+
+</form>
+
+{/* Footer */}
+<p className="mt-6 text-center text-sm text-gray-600">
+  Already have an account?{" "}
+  <Link
+    to="/login"
+    className="text-blue-600 hover:underline font-medium"
+  >
+    Sign in
+  </Link>
+</p>
+
       </div>
     </div>
   );
 };
-
 export default Register;
