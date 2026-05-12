@@ -9,7 +9,7 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 const Register = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
-  const {showToast}=useToast();
+  const { showToast } = useToast();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -18,16 +18,15 @@ const Register = () => {
   });
 
   const [interacted, setInteracted] = useState({});
-  const [errors, setErrors]=useState({});
-  const [apiError,setApiError]=useState(null);
+  const [errors, setErrors] = useState({});
+  const [apiError, setApiError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   // ---------------- VALIDATION ----------------
 
   const validateFields = (name, value) => {
-    const emailRegex =
-      /^[a-zA-Z0-9._%+-]+@[a-zA-Z]+\.[a-zA-Z]{2,}$/;
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z]+\.[a-zA-Z]{2,}$/;
 
     switch (name) {
       case "name":
@@ -45,7 +44,7 @@ const Register = () => {
           return "Password must be at least 6 characters";
         }
         break;
-        
+
       case "phone":
         if (value && !/^[0-9]{10}$/.test(value.trim())) {
           return "Enter a valid phone number";
@@ -78,7 +77,7 @@ const Register = () => {
         [name]: errorMsg,
       }));
     }
-    if(apiError) setApiError(null);
+    if (apiError) setApiError(null);
   };
 
   // ---------------- HANDLE BLUR ----------------
@@ -130,7 +129,7 @@ const Register = () => {
     setErrors({});
     setApiError(null);
     setLoading(true);
-  
+
     try {
       const userData = await signupUser({
         name: formData.name,
@@ -144,7 +143,7 @@ const Register = () => {
 
       setFormData({ name: "", email: "", phone: "", password: "" });
       navigate("/dashboard");
-    } catch(error) {
+    } catch (error) {
       setApiError(error.message || "Registration failed. Please try again.");
     } finally {
       setLoading(false);
@@ -263,7 +262,7 @@ const Register = () => {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-500 hover:text-gray-700"
               >
                 {showPassword ? <FaEyeSlash /> : <FaEye />}
               </button>
@@ -296,6 +295,7 @@ const Register = () => {
             Sign in
           </Link>
         </p>
+
       </div>
     </div>
   );
