@@ -95,17 +95,17 @@ const Home = () => {
     <div className="bg-white">
       {/* HERO */}
       <section className="relative">
-        <div className="max-w-7xl mx-auto px-4 py-16">
-          <div className="relative rounded-[36px] overflow-hidden shadow-2xl">
+        <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8">
+          <div className="relative rounded-[36px] overflow-hidden shadow-2xl min-h-[500px]">
             <img
               src="/hero-section.png"
               alt="Hero"
-              className="w-full h-[500px] object-cover"
+              className="absolute inset-0 w-full h-full object-cover"
             />
 
-            <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-              <div className="text-center text-white max-w-3xl px-4">
-                <h1 className="text-5xl md:text-6xl font-extrabold leading-tight">
+            <div className="absolute inset-0 bg-black/50 flex items-center justify-center text-center">
+              <div className="text-white max-w-3xl px-6">
+                <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold leading-tight tracking-tight">
                   Trusted Home Services Near You
                 </h1>
 
@@ -137,7 +137,7 @@ const Home = () => {
 
       {/* STATS */}
       <section className="py-20 bg-slate-50">
-        <div className="max-w-7xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 grid grid-cols-2 md:grid-cols-4 gap-6">
           {[
             { number: "10K+", label: "Happy Customers" },
             { number: "500+", label: "Verified Workers" },
@@ -146,7 +146,7 @@ const Home = () => {
           ].map((item, idx) => (
             <div
               key={idx}
-              className="bg-white rounded-3xl p-8 text-center shadow-sm border"
+              className="bg-white rounded-3xl p-8 text-center shadow-sm border flex flex-col justify-center min-h-[180px]"
             >
               <h3 className="text-4xl font-extrabold text-slate-900">
                 {item.number}
@@ -182,7 +182,7 @@ const Home = () => {
             </Link>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
             {workers.map((worker) => {
               const WorkerIcon =
                 workerIconMap[worker.profession] || IconBolt;
@@ -190,7 +190,7 @@ const Home = () => {
               return (
                 <div
                   key={worker.id}
-                  className="bg-white border rounded-3xl p-6 shadow-sm hover:shadow-xl transition"
+                  className="bg-white border rounded-3xl p-6 shadow-sm hover:shadow-xl transition flex flex-col h-full"
                 >
                   <div className="flex items-center justify-between">
                     <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center">
@@ -216,7 +216,7 @@ const Home = () => {
                     {worker.profession}
                   </p>
 
-                  <div className="flex items-center justify-between mt-5 text-sm">
+                  <div className="flex items-center justify-between mt-5 text-sm mb-6">
                     <span>⭐ {worker.rating}</span>
                     <span className="font-semibold">
                       {worker.price}
@@ -225,7 +225,7 @@ const Home = () => {
 
                   <Link
                     to={`/worker/${worker.id}`}
-                    className="mt-6 block text-center bg-slate-900 hover:bg-blue-600 text-white py-3 rounded-xl font-semibold transition"
+                    className="mt-auto block text-center bg-slate-900 hover:bg-blue-600 text-white py-3 rounded-xl font-semibold transition"
                   >
                     Book Now
                   </Link>
@@ -243,7 +243,7 @@ const Home = () => {
             How It Works
           </h2>
 
-          <div className="grid md:grid-cols-3 gap-10 mt-16">
+          <div className="grid md:grid-cols-3 gap-8 mt-16 items-stretch">
             {[
               {
                 step: "1",
@@ -263,7 +263,7 @@ const Home = () => {
             ].map((item) => (
               <div
                 key={item.step}
-                className="bg-white rounded-3xl p-10 border shadow-sm"
+                className="bg-white rounded-3xl p-10 border shadow-sm flex flex-col items-center text-center h-full"
               >
                 <div className="w-16 h-16 rounded-full bg-blue-600 text-white flex items-center justify-center text-2xl font-bold mx-auto">
                   {item.step}
@@ -283,8 +283,8 @@ const Home = () => {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-blue-600 text-white text-center">
-        <div className="max-w-3xl mx-auto px-4">
+      <section className="py-24 bg-blue-600 text-white text-center">
+        <div className="max-w-3xl mx-auto px-6 flex flex-col items-center">
           <h2 className="text-5xl font-extrabold">
             Need Help Today?
           </h2>
