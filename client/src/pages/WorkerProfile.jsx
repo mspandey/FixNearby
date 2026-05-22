@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState } from "react";
+import { getEstimatorConfig } from "../utils/estimatorConfig";
 import {
   Star,
   MapPin,
@@ -9,10 +10,14 @@ import {
   Phone,
   MessageCircle,
   CalendarCheck,
+  LayoutGrid,
+  Calculator,
+  MessageSquare,
+  Image,
 } from "lucide-react";
 
 import BookingConfirmationModal from "../components/BookingConfirmationModal";
-import api from "../services/apiClient";
+import SmartEstimator from "../components/SmartEstimator";
 
 /* ✅ Move data outside component */
 const WORKERS = {
@@ -127,6 +132,80 @@ const WORKERS = {
       },
     ],
   },
+  4: {
+    id: 4,
+    name: "Maria Garcia",
+    profession: "Painter",
+    price: "$38/hr",
+    rating: 4.9,
+    experience: "12 Years",
+    location: "Florida, USA",
+    completedJobs: 275,
+    bio: "Professional painter with a decade of experience in residential interiors, color consulting, and premium finishes.",
+    portfolio: [
+      {
+        id: 1,
+        image: "https://images.unsplash.com/photo-1562259949-e8e7689d7828?w=400&h=250&fit=crop",
+        description: "Full interior repaint for a 4-bedroom family home",
+        completionDate: "March 2025",
+        customerRating: 5.0,
+        review: "Flawless finish, completed on time and under budget!",
+      },
+      {
+        id: 2,
+        image: "https://images.unsplash.com/photo-1581858726788-75bc0f6a952d?w=400&h=250&fit=crop",
+        description: "Feature wall accent painting with textured design",
+        completionDate: "January 2025",
+        customerRating: 4.9,
+        review: "Absolutely stunning. Maria has a great eye for color.",
+      },
+      {
+        id: 3,
+        image: "https://images.unsplash.com/photo-1572297773977-c6ce2cff0e1e?w=400&h=250&fit=crop",
+        description: "Kitchen and dining area refresh with semi-gloss finish",
+        completionDate: "November 2024",
+        customerRating: 4.8,
+        review: "Very tidy and professional. Will hire again!",
+      },
+    ],
+  },
+  5: {
+    id: 5,
+    name: "Sarah Lee",
+    profession: "Cleaner",
+    price: "$28/hr",
+    rating: 4.7,
+    experience: "5 Years",
+    location: "Seattle, USA",
+    completedJobs: 320,
+    bio: "Reliable and thorough home cleaning specialist with expertise in deep cleaning, move-in/out cleans, and eco-friendly products.",
+    portfolio: [
+      {
+        id: 1,
+        image: "https://images.unsplash.com/photo-1563453392212-326f5e854473?w=400&h=250&fit=crop",
+        description: "Complete move-out deep clean for a 3-bedroom apartment",
+        completionDate: "April 2025",
+        customerRating: 5.0,
+        review: "Left the apartment spotless. Got our full deposit back!",
+      },
+      {
+        id: 2,
+        image: "https://images.unsplash.com/photo-1584820927498-cfe5211fd8bf?w=400&h=250&fit=crop",
+        description: "Weekly recurring home cleaning service",
+        completionDate: "March 2025",
+        customerRating: 4.7,
+        review: "Consistently excellent work, very dependable.",
+      },
+      {
+        id: 3,
+        image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=250&fit=crop",
+        description: "Post-renovation cleanup for a renovated kitchen",
+        completionDate: "January 2025",
+        customerRating: 4.8,
+        review: "Handled all the construction dust and debris perfectly.",
+      },
+    ],
+  },
 };
 
 const REVIEWS = [
@@ -147,6 +226,13 @@ const REVIEWS = [
   },
 ];
 
+const TABS = [
+  { id: "overview", label: "Overview", icon: LayoutGrid },
+  { id: "estimator", label: "Get Estimate", icon: Calculator },
+  { id: "reviews", label: "Reviews", icon: MessageSquare },
+  { id: "portfolio", label: "Portfolio", icon: Image },
+];
+
 const getBookings = () => {
   try {
     return JSON.parse(localStorage.getItem("bookings")) || [];
@@ -163,10 +249,10 @@ const WorkerProfile = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [worker, setWorker] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [showModal, setShowModal] = useState(false);
+  const [activeTab, setActiveTab]          = useState("overview");
+  const [showModal, setShowModal]           = useState(false);
   const [bookingDetails, setBookingDetails] = useState({});
+  const [showQuickBookPrompt, setShowQuickBookPrompt] = useState(false);
 
   useEffect(() => {
     const loadWorker = async () => {
@@ -213,8 +299,26 @@ const WorkerProfile = () => {
     loadWorker();
   }, [id]);
 
+  /* Detect whether this profession has an estimator config */
+  const hasEstimator = useMemo(
+    () => worker && getEstimatorConfig(worker.profession) !== null,
+    [worker]
+  );
+
+  /* ── Quick book — show estimate prompt if config exists, else book directly ── */
   const handleBooking = () => {
     if (!worker) return;
+    if (hasEstimator) {
+      setShowQuickBookPrompt(true);
+      return;
+    }
+    confirmQuickBook();
+  };
+
+  /* ── Confirmed quick book (no estimate) ── */
+  const confirmQuickBook = () => {
+    if (!worker) return;
+    setShowQuickBookPrompt(false);
 
     const newBooking = {
       id: "BK-" + Math.random().toString(36).slice(2, 8).toUpperCase(),
@@ -227,8 +331,7 @@ const WorkerProfile = () => {
       createdAt: new Date().toISOString(),
     };
 
-    const updated = [newBooking, ...getBookings()];
-    saveBookings(updated);
+    saveBookings([newBooking, ...getBookings()]);
 
     setBookingDetails({
       service: worker.profession,
@@ -236,6 +339,43 @@ const WorkerProfile = () => {
       date: new Date().toLocaleDateString(),
       time: "10:00 AM",
       price: worker.price,
+    });
+
+    setShowModal(true);
+  };
+
+  /* ── Estimate-based booking ── */
+  const handleEstimateBooking = (estimate) => {
+    if (!worker) return;
+
+    const newBooking = {
+      id: "BK-" + Math.random().toString(36).slice(2, 8).toUpperCase(),
+      worker: worker.name,
+      service: worker.profession,
+      date: new Date().toLocaleDateString(),
+      time: "10:00 AM",
+      price: `$${estimate.totalCost.toFixed(2)}`,
+      status: "Pending",
+      createdAt: new Date().toISOString(),
+      estimateSpecs: {
+        summary: estimate.summary,
+        materials: estimate.materials,
+        laborHours: estimate.laborHours,
+        laborCost: estimate.laborCost,
+        materialCost: estimate.materialCost,
+        totalCost: estimate.totalCost,
+      },
+    };
+
+    saveBookings([newBooking, ...getBookings()]);
+
+    setBookingDetails({
+      service: worker.profession,
+      worker: worker.name,
+      date: new Date().toLocaleDateString(),
+      time: "10:00 AM",
+      price: `$${estimate.totalCost.toFixed(2)}`,
+      estimateSpecs: newBooking.estimateSpecs,
     });
 
     setShowModal(true);
@@ -285,12 +425,12 @@ const WorkerProfile = () => {
       />
 
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
+
         {/* LEFT PROFILE CARD */}
         <div className="lg:col-span-1">
           <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 sticky top-6">
 
-           {/* Avatar */}
+            {/* Avatar */}
             <div className="flex flex-col items-center text-center">
               <div className="w-28 h-28 rounded-full bg-blue-100 flex items-center justify-center text-4xl font-bold text-blue-700">
                 {worker.name.charAt(0)}
@@ -326,15 +466,29 @@ const WorkerProfile = () => {
               </div>
             </div>
 
+            {/* Smart Estimate Badge */}
+            {hasEstimator && (
+              <div className="mt-6 flex items-center justify-center gap-2 bg-emerald-50 border border-emerald-200 rounded-2xl py-2.5 px-4">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-xs font-semibold text-emerald-700">
+                  Smart Estimate Available
+                </span>
+              </div>
+            )}
+
             {/* Price */}
-            <div className="mt-8 bg-blue-50 rounded-2xl p-5 text-center">
+            <div className="mt-4 bg-blue-50 rounded-2xl p-5 text-center">
               <p className="text-sm text-gray-500">
                 Starting From
               </p>
-
               <h2 className="text-3xl font-bold text-blue-700 mt-1">
                 {worker.price}
               </h2>
+              {hasEstimator && (
+                <p className="text-xs text-emerald-600 mt-1.5 font-medium">
+                  Use Smart Estimator for exact pricing
+                </p>
+              )}
             </div>
 
             {/* CTA */}
@@ -342,8 +496,38 @@ const WorkerProfile = () => {
               onClick={handleBooking}
               className="w-full mt-6 bg-blue-600 hover:bg-blue-700 transition text-white font-semibold py-3 rounded-2xl shadow-md"
             >
-              Book This Service
+              Quick Book
             </button>
+
+            {/* Inline estimate prompt — shown after Quick Book tap */}
+            {showQuickBookPrompt && (
+              <div className="mt-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 animate-slide-up">
+                <p className="text-sm font-semibold text-amber-800 mb-1">
+                  Want to know the exact cost first?
+                </p>
+                <p className="text-xs text-amber-600 mb-3">
+                  Use the Smart Estimator to get a transparent breakdown before booking.
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      setShowQuickBookPrompt(false);
+                      setActiveTab("estimator");
+                    }}
+                    className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold py-2 rounded-xl transition flex items-center justify-center gap-1"
+                  >
+                    <Calculator size={13} />
+                    Get Estimate
+                  </button>
+                  <button
+                    onClick={confirmQuickBook}
+                    className="flex-1 bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 text-xs font-semibold py-2 rounded-xl transition"
+                  >
+                    Skip, Book Now
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* Contact */}
             <div className="flex gap-3 mt-4">
@@ -361,87 +545,121 @@ const WorkerProfile = () => {
         </div>
 
         {/* RIGHT CONTENT */}
-        <div className="lg:col-span-2 space-y-8">
+        <div className="lg:col-span-2 space-y-6">
 
-          {/* About */}
-          <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
-            <h2 className="text-2xl font-bold mb-4">
-              About Worker
-            </h2>
-
-            <p className="text-gray-600 leading-8">
-              {worker.bio}
-            </p>
-          </div>
-
-          {/* Services */}
-          <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
-            <h2 className="text-2xl font-bold mb-6">
-              Services Offered
-            </h2>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {[
-                "Installation",
-                "Maintenance",
-                "Repair",
-                "Emergency Service",
-              ].map((service, index) => (
-                <div
-                  key={index}
-                  className="border border-gray-200 rounded-2xl p-4 hover:border-blue-500 transition"
+          {/* ── TAB BAR ── */}
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-1.5 flex gap-1">
+            {TABS.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  id={`tab-${tab.id}`}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${isActive
+                      ? "bg-blue-600 text-white shadow-md"
+                      : "text-gray-500 hover:bg-gray-50 hover:text-gray-800"
+                    }`}
                 >
-                  <h3 className="font-semibold text-gray-800">
-                    {service}
-                  </h3>
-
-                  <p className="text-sm text-gray-500 mt-1">
-                    Professional {worker.profession.toLowerCase()} service.
-                  </p>
-                </div>
-              ))}
-            </div>
+                  <Icon size={15} />
+                  <span className="hidden sm:inline">{tab.label}</span>
+                </button>
+              );
+            })}
           </div>
 
-          {/* Reviews */}
-          <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold">
-                Customer Reviews
-              </h2>
+          {/* ── OVERVIEW TAB ── */}
+          {activeTab === "overview" && (
+            <div className="space-y-8">
+              {/* About */}
+              <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
+                <h2 className="text-2xl font-bold mb-4">About Worker</h2>
+                <p className="text-gray-600 leading-8">{worker.bio}</p>
+              </div>
 
-              <div className="flex items-center gap-1 text-yellow-500 font-semibold">
-                <Star size={18} className="fill-yellow-400" />
-                {worker.rating}
+              {/* Services */}
+              <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
+                <h2 className="text-2xl font-bold mb-6">Services Offered</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {["Installation", "Maintenance", "Repair", "Emergency Service"].map((service, index) => (
+                    <div
+                      key={index}
+                      className="border border-gray-200 rounded-2xl p-4 hover:border-blue-500 transition"
+                    >
+                      <h3 className="font-semibold text-gray-800">{service}</h3>
+                      <p className="text-sm text-gray-500 mt-1">
+                        Professional {worker.profession.toLowerCase()} service.
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Availability */}
+              <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-3xl p-8 text-white">
+                <h2 className="text-2xl font-bold">Need urgent service?</h2>
+                <p className="mt-2 text-blue-100">
+                  This worker is available for emergency bookings and same-day service.
+                </p>
+                <div className="flex gap-3 mt-6">
+                  <button
+                    onClick={handleBooking}
+                    className="bg-white text-blue-700 hover:bg-gray-100 font-semibold px-6 py-3 rounded-2xl transition"
+                  >
+                    Quick Book
+                  </button>
+                  <button
+                    onClick={() => setActiveTab("estimator")}
+                    className="bg-white/20 hover:bg-white/30 text-white font-semibold px-6 py-3 rounded-2xl transition flex items-center gap-2"
+                  >
+                    <Calculator size={16} />
+                    Estimate First
+                  </button>
+                </div>
               </div>
             </div>
+          )}
 
-            <div className="space-y-5">
-              {REVIEWS.map((review, i) => (
-                <div
-                  key={i}
-                  className="border border-gray-100 rounded-2xl p-5 hover:shadow-sm transition"
-                >
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-semibold">
-                      {review.name}
-                    </h3>
+          {/* ── ESTIMATOR TAB ── */}
+          {activeTab === "estimator" && (
+            <SmartEstimator
+              profession={worker.profession}
+              priceString={worker.price}
+              onBookWithEstimate={handleEstimateBooking}
+            />
+          )}
 
-                    <span className="text-yellow-500 text-sm font-medium">
-                      ★ {review.rating}
-                    </span>
-                  </div>
-
-                  <p className="text-gray-600 mt-2 leading-7">
-                    {review.text}
-                  </p>
+          {/* ── REVIEWS TAB ── */}
+          {activeTab === "reviews" && (
+            <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold">Customer Reviews</h2>
+                <div className="flex items-center gap-1 text-yellow-500 font-semibold">
+                  <Star size={18} className="fill-yellow-400" />
+                  {worker.rating}
                 </div>
-              ))}
-            </div>
-          </div>
+              </div>
 
-            {/* PORTFOLIO / PREVIOUS WORKS SECTION */}
-          {worker.portfolio && worker.portfolio.length > 0 && (
+              <div className="space-y-5">
+                {REVIEWS.map((review, i) => (
+                  <div
+                    key={i}
+                    className="border border-gray-100 rounded-2xl p-5 hover:shadow-sm transition"
+                  >
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-semibold">{review.name}</h3>
+                      <span className="text-yellow-500 text-sm font-medium">★ {review.rating}</span>
+                    </div>
+                    <p className="text-gray-600 mt-2 leading-7">{review.text}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* ── PORTFOLIO TAB ── */}
+          {activeTab === "portfolio" && worker.portfolio && worker.portfolio.length > 0 && (
             <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
               <h2 className="text-2xl font-bold mb-2">Previous Works</h2>
               <p className="text-gray-500 mb-6">
@@ -453,7 +671,6 @@ const WorkerProfile = () => {
                     key={item.id}
                     className="rounded-2xl border border-gray-100 overflow-hidden hover:shadow-md transition group"
                   >
-                    {/* Image */}
                     <div className="relative h-44 overflow-hidden bg-gray-100">
                       <img
                         src={item.image}
@@ -461,28 +678,24 @@ const WorkerProfile = () => {
                         className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
                       />
                     </div>
- 
-                    {/* Details */}
+
                     <div className="p-5">
                       <p className="font-semibold text-gray-900 text-sm leading-snug mb-2">
                         {item.description}
                       </p>
- 
-                      {/* Date */}
+
                       <div className="flex items-center gap-1.5 text-xs text-gray-400 mb-3">
                         <CalendarCheck size={13} />
                         <span>{item.completionDate}</span>
                       </div>
- 
-                      {/* Rating */}
+
                       <div className="flex items-center gap-1 mb-2">
                         <Star size={13} className="fill-yellow-400 text-yellow-400" />
                         <span className="text-sm font-bold text-gray-800">
                           {item.customerRating}
                         </span>
                       </div>
- 
-                      {/* Review */}
+
                       <p className="text-xs text-gray-500 italic leading-relaxed">
                         "{item.review}"
                       </p>
@@ -493,24 +706,6 @@ const WorkerProfile = () => {
             </div>
           )}
 
-
-          {/* Availability */}
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-3xl p-8 text-white">
-            <h2 className="text-2xl font-bold">
-              Need urgent service?
-            </h2>
-
-            <p className="mt-2 text-blue-100">
-              This worker is available for emergency bookings and same-day service.
-            </p>
-
-            <button
-              onClick={handleBooking}
-              className="mt-6 bg-white text-blue-700 hover:bg-gray-100 font-semibold px-6 py-3 rounded-2xl transition"
-            >
-              Book Now
-            </button>
-          </div>
         </div>
       </div>
     </div>
