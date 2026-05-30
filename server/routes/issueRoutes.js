@@ -9,6 +9,7 @@ import {
   getIssueById,
   updateIssueStatus
 } from '../controllers/issueController.js';
+import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
@@ -35,8 +36,8 @@ router.get('/nearby', getNearbyIssues);
 // POST / (create issue) - supports optional image
 router.post('/', upload.single('image'), createIssue);
 
-// POST /:id/upvote
-router.post('/:id/upvote', upvoteIssue);
+// POST /:id/upvote — requires authentication so each user can vote at most once
+router.post('/:id/upvote', protect, upvoteIssue);
 
 // GET /:id
 router.get('/:id', getIssueById);
