@@ -132,18 +132,44 @@ export const createIssue = async (req, res) => {
 export const upvoteIssue = async (req, res) => {
   try {
     const id = req.params.id;
+    const userId = req.user?._id;
+
+    if (!userId) {
+      return res.status(401).json({ message: 'Authentication required to upvote' });
+    }
 
     if (isDbConnected()) {
-      const issue = await Issue.findById(id);
-      if (!issue) return res.status(404).json({ message: 'Issue not found' });
-      issue.upvotes = (issue.upvotes || 0) + 1;
-      await issue.save();
+      // Use an atomic update that only increments upvotes and appends the
+      // user ID when the user has not already voted ($addToSet prevents
+      // duplicates). findByIdAndUpdate with a condition on upvotedBy ensures
+      // atomicity — no separate read-modify-write race is possible.
+      const issue = await Issue.findOneAndUpdate(
+        { _id: id, upvotedBy: { $ne: userId } },
+        {
+          $inc: { upvotes: 1 },
+          $addToSet: { upvotedBy: userId },
+        },
+        { new: true }
+      );
+
+      if (!issue) {
+        // Either the issue does not exist or the user has already upvoted.
+        const exists = await Issue.exists({ _id: id });
+        if (!exists) return res.status(404).json({ message: 'Issue not found' });
+        return res.status(409).json({ message: 'You have already upvoted this issue' });
+      }
+
       return res.status(200).json(issue);
     }
 
-    // in-memory
+    // in-memory fallback (no persistent deduplication available)
     const issue = inMemoryIssues.find((it) => String(it.id) === String(id));
     if (!issue) return res.status(404).json({ message: 'Issue not found' });
+    if (!issue.upvotedBy) issue.upvotedBy = [];
+    if (issue.upvotedBy.some((uid) => String(uid) === String(userId))) {
+      return res.status(409).json({ message: 'You have already upvoted this issue' });
+    }
+    issue.upvotedBy.push(userId);
     issue.upvotes = (issue.upvotes || 0) + 1;
     return res.status(200).json(issue);
   } catch (err) {
