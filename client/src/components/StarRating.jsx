@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, memo } from "react";
+import { Star } from "lucide-react";
 
-const StarRating = ({ rating, onRatingChange, size = "md" }) => {
+const StarRating = memo(({ rating, onRatingChange, size = "md" }) => {
   const [hoverRating, setHoverRating] = useState(0);
 
   const sizeMap = {
@@ -8,6 +9,7 @@ const StarRating = ({ rating, onRatingChange, size = "md" }) => {
     md: "w-6 h-6",
     lg: "w-8 h-8",
   };
+
 
   const starSize = sizeMap[size] || sizeMap.md;
 
@@ -20,7 +22,7 @@ const StarRating = ({ rating, onRatingChange, size = "md" }) => {
           className="focus:outline-none transition-transform hover:scale-110"
           onMouseEnter={() => setHoverRating(star)}
           onMouseLeave={() => setHoverRating(0)}
-          onClick={() => onRatingChange(star)}
+          onClick={() => onRatingChange && onRatingChange(star)}
         >
           <svg
             className={`${starSize} ${
@@ -38,6 +40,6 @@ const StarRating = ({ rating, onRatingChange, size = "md" }) => {
       ))}
     </div>
   );
-};
+});
 
 export default StarRating;
