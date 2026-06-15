@@ -467,6 +467,63 @@ const Services = () => {
           />
         </div>
 
+  
+     {/* CATEGORY CHIPS */}
+<div className="mb-10">
+  <div className="flex gap-3 overflow-x-auto whitespace-nowrap pb-2 scrollbar-hide">
+    {categories.map((cat) => {
+      const active = categoryFilter === cat;
+
+      return (
+        <button
+          key={cat}
+          onClick={() => setCategoryFilter(cat)}
+          className={`group relative shrink-0 rounded-full border px-5 py-2.5 text-sm font-semibold transition-all duration-300
+            ${
+              active
+                ? "border-blue-600 bg-blue-600 text-white shadow-lg shadow-blue-200"
+                : "border-gray-200 bg-white text-gray-700 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-600"
+            }`}
+        >
+          <span className="flex items-center gap-2">
+            {cat !== "All" && (
+              <span className="text-base">
+                {iconMap[cat] || "🛠️"}
+              </span>
+            )}
+
+            {cat}
+          </span>
+
+          {active && (
+            <span className="absolute inset-0 rounded-full ring-2 ring-blue-200"></span>
+          )}
+        </button>
+      );
+    })}
+  </div>
+</div>
+
+      {/* LOADING */}
+      {loading ? (
+        <LoadingSpinner />
+      ) : (
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {filteredWorkers.map((w) => (
+            <div
+              key={w.id}
+              className="rounded-2xl border bg-white p-6 shadow-sm"
+            >
+              <div className="text-3xl mb-2">
+                {iconMap[w.profession] || "👷"}
+              </div>
+
+              <h3 className="text-xl font-bold">{w.name}</h3>
+              <p className="text-blue-600">{w.profession}</p>
+
+              <div className="mt-2 text-sm text-gray-600">
+                ⭐ {w.rating} • ${w.price}/hr
+              </div>
         <div className="mx-auto flex max-w-3xl flex-col gap-4 sm:flex-row">
           <select
             value={sortBy}
