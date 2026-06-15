@@ -52,9 +52,16 @@ const Navbar = () => {
   const handleLogout = () => { logout(); navigate('/'); };
 
   return (
-    <nav className={`sticky top-0 z-50 transition-all duration-300 ${
-      scrolled ? 'bg-white/95 backdrop-blur shadow-sm border-b border-slate-200/80' : 'bg-white'
-    }`}>
+    <>
+      <a 
+        href="#main-content" 
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:bg-blue-600 focus:text-white focus:px-4 focus:py-2 focus:rounded-lg focus:shadow-lg focus:font-semibold"
+      >
+        Skip to main content
+      </a>
+      <nav className={`sticky top-0 z-50 transition-all duration-300 ${
+        scrolled ? 'bg-white/95 backdrop-blur shadow-sm border-b border-slate-200/80' : 'bg-white'
+      }`}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
 
@@ -176,6 +183,7 @@ const Navbar = () => {
         </nav>
       </div>
     </nav>
+    </>
   );
 };
 
