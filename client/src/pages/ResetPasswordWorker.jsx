@@ -22,12 +22,20 @@ const ResetPasswordWorker = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+if (!password.trim()) {
+  return showToast(
+    "Password cannot be empty.",
+    "error"
+  );
+}
 
-    if (password !== confirmPassword) {
-      return showToast(
-        "Passwords do not match.", "error"
-      );
-    }
+if (password !== confirmPassword) {
+  return showToast(
+    "Passwords do not match.",
+    "error"
+  );
+}
+    
 
     try {
       setLoading(true);
