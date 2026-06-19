@@ -49,5 +49,7 @@ export const getFavorites = async () => {
  */
 export const isFavorited = async (workerId) => {
   const favorites = await getFavorites();
-  return favorites.some((fav) => fav.worker._id === workerId);
+ return favorites.some(
+  (fav) => fav.worker?._id === workerId
+);
 };
