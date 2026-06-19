@@ -102,12 +102,6 @@ const HelpCenter = () => {
 
   const toggleFAQ = (id) => {
     setActiveFAQ(activeFAQ === id ? null : id);
-import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import { signupUser } from "../services/authService";
-import useToast from "../hooks/useToast";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 
 const Register = () => {
