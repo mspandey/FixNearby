@@ -52,7 +52,14 @@ const workerIconMap = {
   "Pest Control":   IconBug,
 };
 
-const CATEGORIES  = ["All", ...new Set(ALL_WORKERS.map((w) => w.profession))];
+const CATEGORIES = [
+  "All",
+  ...new Set(
+    ALL_WORKERS
+      .map((w) => w.profession)
+      .filter(Boolean)
+  ),
+];
 const SORT_OPTIONS = [
   { value: "score",    label: "Best Match" },
   { value: "rating",   label: "Highest Rated" },
