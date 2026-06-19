@@ -259,7 +259,8 @@ const Services = () => {
   }, []);
 
   /* SYNC URL */
-    const loadData = async () => {
+    useEffect(() => {
+  const loadData = async () => {
       setLoading(true);
       try {
         const backendWorkers = await fetchWorkers();
@@ -365,8 +366,8 @@ const Services = () => {
 
     return result;
   }, [workers, searchQuery, categoryFilter, sortBy, coords]);
-  }, [categoryFilter, coords, searchQuery, sortBy, urgentFilter, workers, advancedFilters]);
-  }, [workers, searchQuery, categoryFilter, sortBy]);
+
+ 
 
   const handleRecentlyViewed = (worker) => {
     let stored = JSON.parse(localStorage.getItem("recentWorkers")) || [];
