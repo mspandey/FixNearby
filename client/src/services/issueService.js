@@ -52,12 +52,7 @@ export async function createIssue(issueData) {
       formData.append('image', issueData.imageFile);
     }
 
-    const response = await api.post('/issues', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    });
-    
+    const response = await api.post('/issues', formData);
     return response.data;
   } catch (error) {
     console.error('Error creating issue:', error);
