@@ -29,7 +29,7 @@ const Profile = () => {
         phone: formData.phone.trim(),
       });
       
-      login(updatedUser);
+     login(updatedUser.user);
       showToast("Profile updated successfully!", "success");
     } catch (error) {
       console.error("Save failed:", error);
